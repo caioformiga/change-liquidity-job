@@ -101,6 +101,6 @@ func UpdateConfig(config LiquidityPoolConfigs, randomNumber int) (err error) {
 		return
 	}
 
-	log.Default().Println("updated base: %f / quote: %f", percentToMoveBaseAmount, percentToMoveQuoteAmount)
+	log.Default().Printf("updated base: %f / quote: %f", percentToMoveBaseAmount, percentToMoveQuoteAmount)
 	return
 }
