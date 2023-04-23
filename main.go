@@ -51,7 +51,9 @@ func main() {
 
 	// if cant load config creates one using configs.json
 	if len(config.ID) == 0 {
-		src.AddConfig()
+		if err = src.AddConfig(); err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	go func() {

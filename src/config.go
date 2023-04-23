@@ -4,9 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/klever-io/inject-liqduidity-job/utils"
@@ -36,6 +38,9 @@ func findByID(configID string) (config LiquidityPoolConfigs, err error) {
 	}
 
 	if err = cursor.Decode(&config); err != nil {
+		if err == io.EOF {
+			return config, nil
+		}
 		err = fmt.Errorf("%v: %v", getConfigsErrorOnCursor, err)
 		return
 	}
@@ -109,7 +114,10 @@ func UpdateConfig(config LiquidityPoolConfigs, randomNumber int) (err error) {
 }
 
 func AddConfig() (err error) {
-	jsonFile, err := os.Open("../configs.json")
+	path := os.Getenv("SEED_PATH")
+	path = filepath.Join(path, "seed_configs.json")
+
+	jsonFile, err := os.Open(path)
 	if err != nil {
 		return
 	}
@@ -124,6 +132,17 @@ func AddConfig() (err error) {
 	if err != nil {
 		return
 	}
+	config.CreatedAt = time.Now()
+	config.UpdatedAt = time.Now()
 
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(utils.GetTimeoutDB())*time.Second)
+	defer cancel()
+
+	rs, err := MongoDatabase.Collection("configs").InsertOne(ctx, config)
+	if err != nil {
+		return
+	}
+
+	log.Default().Printf("updated config with ID: %v", rs.InsertedID)
 	return
 }
