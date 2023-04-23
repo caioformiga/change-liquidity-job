@@ -27,8 +27,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	URI := os.Getenv("WORKSPACE_MONGO_URI")
-	database := os.Getenv("WORKSPACE_MONGO_DB")
+	URI := os.Getenv("MONGO_URI")
+	database := os.Getenv("MONGO_DB")
 	dbTimeout := utils.GetTimeoutDB()
 
 	var err error
@@ -37,7 +37,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	src.MongoDatabase = src.MongoDatabase.Client().Database(database)
+	src.MongoDatabase = src.MongoClient.Database(database)
 
 	configID := os.Getenv("CONFIG_ID")
 	if len(configID) == 0 {
