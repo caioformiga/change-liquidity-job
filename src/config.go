@@ -31,14 +31,15 @@ func findByID(configID string) (config LiquidityPoolConfigs, err error) {
 
 	filter := primitive.M{"_id": objectID}
 
-	cursor, err := MongoDatabase.Collection("configs").Find(ctx, filter)
+	rs := MongoDatabase.Collection("configs").FindOne(ctx, filter)
 	if err != nil {
 		err = fmt.Errorf("%v: %v", getConfigsErrorOnDB, err)
 		return
 	}
 
-	if err = cursor.Decode(&config); err != nil {
+	if err = rs.Decode(&config); err != nil {
 		if err == io.EOF {
+			config.ID = primitive.NilObjectID
 			return config, nil
 		}
 		err = fmt.Errorf("%v: %v", getConfigsErrorOnCursor, err)
@@ -64,7 +65,7 @@ func UpdateConfig(config LiquidityPoolConfigs, randomNumber int) (err error) {
 		return
 	}
 
-	objectID, err := primitive.ObjectIDFromHex(config.ID)
+	objectID, err := primitive.ObjectIDFromHex(config.ConfigID)
 	if err != nil {
 		return
 	}
@@ -132,6 +133,12 @@ func AddConfig() (err error) {
 	if err != nil {
 		return
 	}
+
+	objectID, err := primitive.ObjectIDFromHex(config.ConfigID)
+	if err != nil {
+		return
+	}
+	config.ID = objectID
 	config.CreatedAt = time.Now()
 	config.UpdatedAt = time.Now()
 

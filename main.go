@@ -10,6 +10,7 @@ import (
 
 	"github.com/klever-io/inject-liqduidity-job/src"
 	"github.com/klever-io/inject-liqduidity-job/utils"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func main() {
@@ -50,7 +51,7 @@ func main() {
 	}
 
 	// if cant load config creates one using configs.json
-	if len(config.ID) == 0 {
+	if config.ID == primitive.NilObjectID {
 		if err = src.AddConfig(); err != nil {
 			log.Fatal(err)
 		}
