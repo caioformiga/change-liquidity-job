@@ -2,8 +2,11 @@ package src
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"os"
 	"time"
 
 	"github.com/klever-io/inject-liqduidity-job/utils"
@@ -102,5 +105,25 @@ func UpdateConfig(config LiquidityPoolConfigs, randomNumber int) (err error) {
 	}
 
 	log.Default().Printf("updated base: %f / quote: %f", percentToMoveBaseAmount, percentToMoveQuoteAmount)
+	return
+}
+
+func AddConfig() (err error) {
+	jsonFile, err := os.Open("../configs.json")
+	if err != nil {
+		return
+	}
+
+	bytes, err := ioutil.ReadAll(jsonFile)
+	if err != nil {
+		return
+	}
+
+	var config LiquidityPoolConfigs
+	err = json.Unmarshal(bytes, &config)
+	if err != nil {
+		return
+	}
+
 	return
 }

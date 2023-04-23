@@ -41,7 +41,17 @@ func main() {
 
 	configID := os.Getenv("CONFIG_ID")
 	if len(configID) == 0 {
-		return
+		log.Fatal(fmt.Errorf("missing environment variable 'CONFIG_ID'"))
+	}
+
+	config, err := src.LoadConfig(configID)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// if cant load config creates one using configs.json
+	if len(config.ID) == 0 {
+		src.AddConfig()
 	}
 
 	go func() {
